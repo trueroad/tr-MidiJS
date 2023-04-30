@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Sample using BleMidiPacket.js</title>
+    <script type="module" src="./js-for-sample/sample-BleMidiPacket.js">
+    </script>
+    <script type="module" src="./js-for-sample/InterceptConsole.js">
+    </script>
+  </head>
+  <body>
+    <h1>Sample using BleMidiPacket.js</h1>
+    <p>
+      Sample using BLE-MIDI packet module<br>
+      Copyright (C) 2023 Masamichi Hosoda<br>
+      License: BSD-2-Clause<br>
+      <a href="https://github.com/trueroad/tr-MidiJS">
+        https://github.com/trueroad/tr-MidiJS
+      </a>
+    </p>
+
+    <hr>
+
+    <h2>Function</h2>
+
+    <h3>Decoder</h3>
+    <p>
+      <button id="initializeDecoderButton">Initialize decoder</button>
+      <button id="decodeButton">Decode</button><br>
+<textarea id="toDecode" cols="80" rows="25">
+{"t": 1000, "data": [128, 128, 224, 0, 64]}
+{"ns": 2000000, "data": [128, 128, 224, 0, 64]}
+</textarea>
+    </p>
+
+    <h3>Reassembler</h3>
+    <p>
+      <button id="initializeReassemblerButton">Initialize reassembler</button>
+      <button id="reassembleButton">Reassemble</button><br>
+<textarea id="toReassemble" cols="80" rows="25">
+{"delta":0,"message":[224,0,64]}
+{"delta":0,"message":[224,0,64]}
+</textarea>
+    </p>
+
+    <hr>
+
+    <h2>Decoded (fragmented) message</h2>
+    <p>
+      <button id="clearDecodedLogButton">Clear Log</button>
+    </p>
+    <p>
+      JSON<br>
+      <textarea id="decodedLog" readonly
+                cols="80" rows="25"></textarea>
+    </p>
+    <p>
+      Hex text<br>
+      <textarea id="decodedHexLog" readonly
+                cols="80" rows="25"></textarea>
+    </p>
+
+    <h2>Reassembled message</h2>
+    <p>
+      <button id="clearReassembledLogButton">Clear Log</button>
+    </p>
+    <p>
+      JSON<br>
+      <textarea id="reassembledLog" readonly
+                cols="80" rows="25"></textarea>
+    </p>
+    <p>
+      Hex text<br>
+      <textarea id="reassembledHexLog" readonly
+                cols="80" rows="25"></textarea>
+    </p>
+
+    <hr>
+
+    <h2>console.log</h2>
+    <p>
+      <button id="interceptStartButton">Intercept start</button>
+      <button id="interceptStopButton">Intercept stop</button>
+      <button id="clearInterceptLogButton">Clear Log</button>
+    </p>
+    <p>
+      <textarea id="interceptLog" readonly
+                cols="80" rows="25"></textarea>
+    </p>
+  </body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Sample BLE-MIDI to SMF</title>
+    <script type="module" src="./js-for-sample/sample-BLE-MIDI-to-SMF.js">
+    </script>
+    <script type="module" src="./js-for-sample/InterceptConsole.js">
+    </script>
+  </head>
+  <body>
+    <h1>Sample BLE-MIDI to SMF</h1>
+    <p>
+      Sample BLE-MIDI to SMF<br>
+      Copyright (C) 2023 Masamichi Hosoda<br>
+      License: BSD-2-Clause<br>
+      <a href="https://github.com/trueroad/tr-MidiJS">
+        https://github.com/trueroad/tr-MidiJS
+      </a>
+    </p>
+
+    <hr>
+
+    <h2>Function</h2>
+    <p>
+      Status: <span id="statusSpan"></span>
+    </p>
+    <p>
+      <button id="selectConnectButton">select connect</button><br>
+      <button id="recordButton" disabled>record</button><br>
+      <button id="stopButton" disabled>stop</button><br>
+      <button id="downloadButton" disabled>download</button>
+    </p>
+
+    <hr>
+
+    <h2>Value changed</h2>
+    <p>
+      <button id="clearValueChangedLogButton">Clear Log</button>
+    </p>
+    <p>
+      JSON<br>
+      <textarea id="valueChangedLog" readonly
+                cols="80" rows="25"></textarea>
+    </p>
+
+    <hr>
+
+    <h2>Decoded (fragmented) message</h2>
+    <p>
+      <button id="clearDecodedLogButton">Clear Log</button>
+    </p>
+    <p>
+      JSON<br>
+      <textarea id="decodedLog" readonly
+                cols="80" rows="25"></textarea>
+    </p>
+
+    <h2>Reassembled message</h2>
+    <p>
+      <button id="clearReassembledLogButton">Clear Log</button>
+    </p>
+    <p>
+      JSON<br>
+      <textarea id="reassembledLog" readonly
+                cols="80" rows="25"></textarea>
+    </p>
+
+    <hr>
+
+    <h2>Filtered message</h2>
+    <p>
+      <button id="clearFilteredLogButton">Clear Log</button>
+    </p>
+    <p>
+      JSON<br>
+      <textarea id="filteredLog" readonly
+                cols="80" rows="25"></textarea>
+    </p>
+
+    <hr>
+
+    <h2>console.log</h2>
+    <p>
+      <button id="interceptStartButton">Intercept start</button>
+      <button id="interceptStopButton">Intercept stop</button>
+      <button id="clearInterceptLogButton">Clear Log</button>
+    </p>
+    <p>
+      <textarea id="interceptLog" readonly
+                cols="80" rows="25"></textarea>
+    </p>
+  </body>
+</html>
