@@ -1,0 +1,27 @@
+{
+  "extends": "eslint:recommended",
+  "env": {
+    "browser": true,
+    "es2017": true
+  },
+  "parserOptions": {
+    "sourceType": "module"
+  },
+  "rules": {
+    "indent": ["error", 2, {
+      "ArrayExpression": "first",
+      "CallExpression": {
+        "arguments": "first"
+      },
+      "FunctionDeclaration": {
+        "parameters": "first"
+      },
+      "FunctionExpression": {
+        "parameters": "first"
+      },
+      "ObjectExpression": "first",
+      "VariableDeclarator": "first",
+      "ignoredNodes": ["ConditionalExpression"]
+    }]
+  }
+}

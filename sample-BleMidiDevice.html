@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Sample using BleMidiDevice.js</title>
+    <script type="module" src="./js-for-sample/sample-BleMidiDevice.js">
+    </script>
+    <script type="module" src="./js-for-sample/sample-BleMidiPacket.js">
+    </script>
+    <script type="module" src="./js-for-sample/InterceptConsole.js">
+    </script>
+  </head>
+  <body>
+    <h1>Sample using BleMidiDevice.js</h1>
+    <p>
+      Sample using BLE-MIDI device module / BLE-MIDI packet module<br>
+      Copyright (C) 2023 Masamichi Hosoda<br>
+      License: BSD-2-Clause<br>
+      <a href="https://github.com/trueroad/tr-MidiJS">
+        https://github.com/trueroad/tr-MidiJS
+      </a>
+    </p>
+
+    <hr>
+
+    <h2>Function</h2>
+    <p>
+      <button id="selectButton">select</button>
+      <span id="selectStatus"></span><br>
+    </p>
+    <p>
+      <button id="connectButton">connect</button>
+      <span id="connectStatus"></span><br>
+      <button id="disconnectButton">disconnect</button>
+      <span id="disconnectStatus"></span><br>
+    </p>
+    <p>
+      <button id="startButton">start</button>
+      <span id="startStatus"></span><br>
+      <button id="stopButton">stop</button>
+      <span id="stopStatus"></span><br>
+    </p>
+    <p>
+      <button id="writeButton">write</button>
+      <span id="writeStatus"></span><br>
+      <input type="text" id="writeValue" style="width: 95%;"
+             value='{"data": [128, 128, 144, 64, 120]}'>
+    </p>
+    <p>
+      <button id="isConnectedButton">isConnected</button>
+      <span id="isConnectedStatus"></span><br>
+      <button id="getDeviceNameButton">getDeviceName</button>
+      <span id="getDeviceNameStatus"></span><br>
+    </p>
+
+    <hr>
+
+    <h2>Value changed</h2>
+    <p>
+      <button id="clearValueChangedLogButton">Clear Log</button>
+    </p>
+    <p>
+      <textarea id="valueChangedLog" readonly
+                cols="80" rows="25"></textarea>
+    </p>
+
+    <hr>
+
+    <h2>Decoded (fragmented) message</h2>
+    <p>
+      <button id="initializeDecoderButton">Initialize decoder</button>
+      <button id="clearDecodedLogButton">Clear Log</button>
+    </p>
+    <p>
+      <textarea id="decodedLog" readonly
+                cols="80" rows="25"></textarea>
+    </p>
+
+    <h2>Reassembled message</h2>
+    <p>
+      <button id="initializeReassemblerButton">Initialize reassembler</button>
+      <button id="clearReassembledLogButton">Clear Log</button>
+    </p>
+    <p>
+      <textarea id="reassembledLog" readonly
+                cols="80" rows="25"></textarea>
+    </p>
+
+    <hr>
+
+    <h2>console.log</h2>
+    <p>
+      <button id="interceptStartButton">Intercept start</button>
+      <button id="interceptStopButton">Intercept stop</button>
+      <button id="clearInterceptLogButton">Clear Log</button>
+    </p>
+    <p>
+      <textarea id="interceptLog" readonly
+                cols="80" rows="25"></textarea>
+    </p>
+  </body>
+</html>
