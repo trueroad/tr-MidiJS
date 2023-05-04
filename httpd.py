@@ -51,9 +51,17 @@ def main() -> None:
     app.run(debug=True)
 
 
-@app.route('/midi/evaluate', methods=['POST'])
+@app.route('/midi/evaluate', methods=['POST', 'OPTIONS'])
 def evaluate() -> Response:
     """Evaluate SMF."""
+    if request.method == 'OPTIONS':
+        resp_opt: Response = make_response("", 204)
+        resp_opt.headers['Access-Control-Allow-Origin'] = '*'
+        resp_opt.headers['Access-Control-Allow-Private-Network'] = 'true'
+        resp_opt.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
+        resp_opt.headers['Access-Control-Max-Age'] = '180'
+        return resp_opt
+
     dt: datetime = datetime.now(timezone.utc).astimezone()
 
     fpost: BinaryIO
@@ -66,6 +74,9 @@ def evaluate() -> Response:
 
     resp: Response = make_response({'Date': dtstr})
     resp.headers['Access-Control-Allow-Origin'] = '*'
+    resp.headers['Access-Control-Allow-Private-Network'] = 'true'
+    resp.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
+    resp.headers['Access-Control-Max-Age'] = '180'
 
     return resp
 
