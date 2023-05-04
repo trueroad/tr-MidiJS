@@ -231,12 +231,16 @@ async function start() {
                                "Date": getISOStringTZ(recordingDateTime)});
   smfEncoder.meta_text(0, 1, text);
 
+  bleMidiDevice.bleMidiPacket.setWaitUntilStable(true);
+
   try {
     await bleMidiDevice.start();
   } catch (err) {
     statusSpan.innerText = err;
     return;
   }
+
+  bleMidiDevice.bleMidiPacket.startWaitUntilStableTimeout();
 
   stopButton.removeAttribute("disabled");
   statusSpan.innerText = "Recording...";

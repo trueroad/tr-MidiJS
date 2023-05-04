@@ -57,14 +57,7 @@ export class BleMidiPacket {
     this._bleTimestampBefore = null;
     this._eventTimestampBefore = null;
     this._deltaUnaddedDecode = 0;
-    this._bWaitUntilStable = true;
-    setTimeout(() => {
-      if (this._bWaitUntilStable) {
-        console.log("BleMidiPacket.initializeDecoder(): " +
-                    "Timeout waiting for timestamp stabilization.");
-        this._bWaitUntilStable = false;
-      }
-    }, this.timeoutUnstableTimestamp);
+    this._bWaitUntilStable = false;
   }
 
   /**
@@ -77,6 +70,27 @@ export class BleMidiPacket {
     this._deltaUnaddedReassembly = 0;
     this._deltaSysexStart = 0;
     this._deltaAfter = 0;
+  }
+
+  /**
+   * Set wait until stable timestamp flag.
+   * @param {bool} bWaitUntilStable - Wait until stable timestamp flag.
+   */
+  setWaitUntilStable(bWaitUntilStable) {
+    this._bWaitUntilStable = bWaitUntilStable;
+  }
+
+  /**
+   * Start wait until stable timestamp timeout.
+   */
+  startWaitUntilStableTimeout() {
+    setTimeout(() => {
+      if (this._bWaitUntilStable) {
+        console.log("BleMidiPacket.startWaitUntilStableTimeout(): " +
+                    "Timeout waiting for timestamp stabilization.");
+        this._bWaitUntilStable = false;
+      }
+    }, this.timeoutUnstableTimestamp);
   }
 
   /**
