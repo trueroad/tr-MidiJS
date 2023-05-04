@@ -24,7 +24,7 @@ export class MidiFilter {
 
     /**
      * Specify a handler function to be called
-     *     when a MIDI message  is filtered.
+     *     when a MIDI message is filtered.
      *     If null, the default handler is called.
      * @member {?module:MidiFilter.MidiFilter~HandlerMidiMessage}
      */
