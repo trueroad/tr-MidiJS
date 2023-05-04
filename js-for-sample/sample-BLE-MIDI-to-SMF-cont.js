@@ -1,6 +1,6 @@
 /**
- * Sample BLE-MIDI to SMF.
- * @module sample-BLE-MIDI-to-SMF
+ * Sample BLE-MIDI to SMF continuance.
+ * @module sample-BLE-MIDI-to-SMF-cont
  * @author Masamichi Hosoda <trueroad@trueroad.jp>
  * @copyright (C) Masamichi Hosoda 2023
  * @license BSD-2-Clause
@@ -9,8 +9,9 @@
 
 import {BleMidiDevice} from "../js/BleMidiDevice.js";
 import {MidiFilter} from "../js/MidiFilter.js";
+import {GapDetector} from "../js/GapDetector.js";
 import {SmfEncoder} from "../js/SmfEncoder.js";
-import {getISOStringTZ, getISOStringBasicTZ} from "./getISOStringTZ.js";
+import {getISOStringTZ} from "./getISOStringTZ.js";
 
 /**
  * BleMidiDevice class instance.
@@ -25,6 +26,12 @@ export const bleMidiDevice = new BleMidiDevice();
 export const midiFilter = new MidiFilter();
 
 /**
+ * GapDetector class instance.
+ * @type {module:GapDetector.GapDetector}
+ */
+export const gapDetector = new GapDetector();
+
+/**
  * SmfEncoder class instance.
  * @type {module:SmfEncoder.SmfEncoder}
  */
@@ -35,28 +42,17 @@ export const smfEncoder = new SmfEncoder();
 //
 
 // Button
-const selectConnectButton = document.getElementById("selectConnectButton");
-const recordButton = document.getElementById("recordButton");
+const selectStartButton = document.getElementById("selectStartButton");
 const stopButton = document.getElementById("stopButton");
-const downloadButton = document.getElementById("downloadButton");
-
-const clearValueChangedLogButton =
-      document.getElementById("clearValueChangedLogButton");
-const clearDecodedLogButton =
-      document.getElementById("clearDecodedLogButton");
-const clearReassembledLogButton =
-      document.getElementById("clearReassembledLogButton");
-const clearFilteredLogButton =
-      document.getElementById("clearFilteredLogButton");
 
 // Status span
 const statusSpan = document.getElementById("statusSpan");
 
-// Log textarea
-const valueChangedLog = document.getElementById("valueChangedLog");
-const decodedLog = document.getElementById("decodedLog");
-const reassembledLog = document.getElementById("reassembledLog");
-const filteredLog = document.getElementById("filteredLog");
+// Input text
+const postUrl = document.getElementById("postUrl");
+
+//Result textarea
+const postResult = document.getElementById("postResult");
 
 //
 // Handler
@@ -68,8 +64,6 @@ const filteredLog = document.getElementById("filteredLog");
  * @param {ArrayBuffer} value - Changed value.
  */
 function handlerValueChanged(timeStamp, value) {
-  // Logging
-  logValueChanged(timeStamp, value);
   // Pass through to MIDI decoder
   bleMidiDevice.bleMidiPacket.decode(timeStamp, value);
 }
@@ -84,8 +78,6 @@ bleMidiDevice.handlerValueChanged = handlerValueChanged;
  * @param {Uint8Array} message - MIDI message (fragmented).
  */
 function handlerMidiMessageDecoded(delta, message) {
-  // Logging
-  logMidiMessage(delta, message, decodedLog);
   // Pass through to MIDI reassembler
   bleMidiDevice.bleMidiPacket.reassemble(delta, message);
 }
@@ -101,8 +93,6 @@ bleMidiDevice.bleMidiPacket.handlerMidiMessageDecoded =
  * @param {Uint8Array} message - MIDI message (reassembled).
  */
 function handlerMidiMessageReassembled(delta, message) {
-  // Logging
-  logMidiMessage(delta, message, reassembledLog);
   // Pass through to MIDI filter
   midiFilter.filter(delta, message);
 }
@@ -118,8 +108,13 @@ bleMidiDevice.bleMidiPacket.handlerMidiMessageReassembled =
  * @param {Uint8Array} message - MIDI message (filtered).
  */
 function handlerMidiMessageFiltered(delta, message) {
+  // Gap detection
+  gapDetector.detect(delta, message);
+
   // Logging
-  logMidiMessage(delta, message, filteredLog);
+  console.log(JSON.stringify({"delta": delta,
+                              "message": Array.from(message)}));
+
   // Pass through to SMF encoder
   smfEncoder.encode(delta, message);
 }
@@ -128,35 +123,49 @@ function handlerMidiMessageFiltered(delta, message) {
 midiFilter.handlerMidiMessageFiltered =
   handlerMidiMessageFiltered;
 
-//
-// Logging
-//
-
 /**
- * Logging value changed.
- * @param {number} timeStamp - Timestamp in millisecond.
- * @param {ArrayBuffer} value - Changed value.
+ * Handler function to be called when a gap is detected.
  */
-function logValueChanged(timeStamp, value) {
-  if (valueChangedLog) {
-    valueChangedLog.value +=
-      JSON.stringify({"ns": timeStamp * 1000,
-                      "data": Array.from(new Uint8Array(value))}) + "\n";
-    valueChangedLog.scrollTop = valueChangedLog.scrollHeight;
-  }
+function HandlerGapDetected() {
+  console.log("*** Gap detected ***");
+  _post_smf();
 }
 
+// Set the handler function.
+gapDetector.handlerGapDetected = HandlerGapDetected;
+
 /**
- * Logging MIDI message.
- * @param {number} delta - Delta time in millisecond.
- * @param {Uint8Array} message - MIDI message (reassembled).
- * @param {?HTMLTextAreaElement} json - JSON log element.
+ * POST divided SMF.
+ * @private
  */
-function logMidiMessage(delta, message, json) {
-  if (json) {
-    json.value +=
-      JSON.stringify({"delta": delta, "message": Array.from(message)}) + "\n";
-    json.scrollTop = json.scrollHeight;
+async function _post_smf() {
+  // Builds an SMF from buffer containing arrived MIDI messages.
+  const blob = smfEncoder.build();
+
+  // Clear the buffer.
+  // Subsequent incoming messages will be stored in the next SMF.
+  smfEncoder.initialize();
+  const text = JSON.stringify({"Module": "BleMidiDevice.js",
+                               "Device": bleMidiDevice.getDeviceName(),
+                               "User-Agent": navigator.userAgent,
+                               "Language": navigator.language,
+                               "Location": location.href,
+                               "Date": getISOStringTZ(recordingDateTime)});
+  smfEncoder.meta_text(0, 1, text);
+
+  // Builds a form from the built SMF.
+  const formData = new FormData();
+  formData.append("foreval", blob, "foreval.mid");
+
+  try {
+    const resp = await fetch(postUrl.value, {method: 'POST', body: formData});
+    if (resp.status !== 200) {
+      postResult.value = resp.status + " " + resp.statusText;
+    } else {
+      postResult.value = await resp.text();
+    }
+  } catch (err) {
+    postResult.value = err;
   }
 }
 
@@ -167,11 +176,7 @@ function logMidiMessage(delta, message, json) {
 /** Recording date time */
 let recordingDateTime;
 
-async function selectConnect() {
-  recordButton.setAttribute("disabled", true);
-  stopButton.setAttribute("disabled", true);
-  downloadButton.setAttribute("disabled", true);
-
+async function selectStart() {
   if (bleMidiDevice.isConnected()) {
     statusSpan.innerText = "disconnecting...";
     try {
@@ -207,15 +212,7 @@ async function selectConnect() {
     return;
   }
 
-  recordButton.removeAttribute("disabled");
-  statusSpan.innerText = "Ready to start recording.";
-}
-
-async function start() {
   statusSpan.innerText = "starting...";
-  recordButton.setAttribute("disabled", true);
-  stopButton.setAttribute("disabled", true);
-  downloadButton.setAttribute("disabled", true);
 
   bleMidiDevice.bleMidiPacket.initializeDecoder();
   bleMidiDevice.bleMidiPacket.initializeReassembler();
@@ -242,15 +239,13 @@ async function start() {
 
   bleMidiDevice.bleMidiPacket.startWaitUntilStableTimeout();
 
+  postUrl.setAttribute("disabled", true);
   stopButton.removeAttribute("disabled");
   statusSpan.innerText = "Recording...";
 }
 
 async function stop() {
   statusSpan.innerText = "stopping...";
-  recordButton.setAttribute("disabled", true);
-  stopButton.setAttribute("disabled", true);
-  downloadButton.setAttribute("disabled", true);
 
   try {
     await bleMidiDevice.stop();
@@ -259,52 +254,16 @@ async function stop() {
     return;
   }
 
-  recordButton.removeAttribute("disabled");
-  downloadButton.removeAttribute("disabled");
-  statusSpan.innerText = "Ready to download.";
-}
-
-function download() {
-  const link = document.createElement("a");
-  link.download = "data-" + getISOStringBasicTZ(recordingDateTime) + ".mid";
-  link.href = URL.createObjectURL(smfEncoder.build());
-  link.click();
-  URL.revokeObjectURL(link.href);
-}
-
-function clearValueChangedLog() {
-  valueChangedLog && (valueChangedLog.value = "");
-}
-
-function clearDecodedLog() {
-  decodedLog && (decodedLog.value = "");
-}
-
-function clearReassembledLog() {
-  reassembledLog && (reassembledLog.value = "");
-}
-
-function clearFilteredLog() {
-  filteredLog && (filteredLog.value = "");
+  stopButton.setAttribute("disabled", true);
+  postUrl.removeAttribute("disabled");
+  statusSpan.innerText = "Stopped.";
 }
 
 //
 // Add event listener
 //
 
-selectConnectButton &&
-  selectConnectButton.addEventListener("click", selectConnect);
-recordButton &&
-  recordButton.addEventListener("click", start);
+selectStartButton &&
+  selectStartButton.addEventListener("click", selectStart);
 stopButton &&
   stopButton.addEventListener("click", stop);
-downloadButton &&
-  downloadButton.addEventListener("click", download);
-clearValueChangedLogButton &&
-  clearValueChangedLogButton.addEventListener("click", clearValueChangedLog);
-clearDecodedLogButton &&
-  clearDecodedLogButton.addEventListener("click", clearDecodedLog);
-clearReassembledLogButton &&
-  clearReassembledLogButton.addEventListener("click", clearReassembledLog);
-clearFilteredLogButton &&
-  clearFilteredLogButton.addEventListener("click", clearFilteredLog);

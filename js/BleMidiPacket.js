@@ -57,14 +57,7 @@ export class BleMidiPacket {
     this._bleTimestampBefore = null;
     this._eventTimestampBefore = null;
     this._deltaUnaddedDecode = 0;
-    this._bWaitUntilStable = true;
-    setTimeout(() => {
-      if (this._bWaitUntilStable) {
-        console.log("BleMidiPacket.initializeDecoder(): " +
-                    "Timeout waiting for timestamp stabilization.");
-        this._bWaitUntilStable = false;
-      }
-    }, this.timeoutUnstableTimestamp);
+    this._bWaitUntilStable = false;
   }
 
   /**
@@ -77,6 +70,27 @@ export class BleMidiPacket {
     this._deltaUnaddedReassembly = 0;
     this._deltaSysexStart = 0;
     this._deltaAfter = 0;
+  }
+
+  /**
+   * Set wait until stable timestamp flag.
+   * @param {bool} bWaitUntilStable - Wait until stable timestamp flag.
+   */
+  setWaitUntilStable(bWaitUntilStable) {
+    this._bWaitUntilStable = bWaitUntilStable;
+  }
+
+  /**
+   * Start wait until stable timestamp timeout.
+   */
+  startWaitUntilStableTimeout() {
+    setTimeout(() => {
+      if (this._bWaitUntilStable) {
+        console.log("BleMidiPacket.startWaitUntilStableTimeout(): " +
+                    "Timeout waiting for timestamp stabilization.");
+        this._bWaitUntilStable = false;
+      }
+    }, this.timeoutUnstableTimestamp);
   }
 
   /**
@@ -224,13 +238,17 @@ export class BleMidiPacket {
                   "Unstable timestamp: Negative delta.");
       this._deltaUnaddedDecode +=
         Math.ceil(- this._deltaUnaddedDecode / 8192) * 8192;
-    } else if ((Math.abs(eventDelta - bleDelta) % 8192) >
-               this.timestampErrorThreshold) {
-      console.log("BleMidiPacket._setHeaderTimestamp(): " +
-                  "Unstable timestamp: Differential error exceeds " +
-                  this.timestampErrorThreshold + " ms.");
     } else {
-      if (this._bWaitUntilStable) {
+      const diff = Math.abs(eventDelta - bleDelta) % 8192;
+      if (this.timestampErrorThreshold < diff &&
+          diff < (8192 - this.timestampErrorThreshold)) {
+        console.log("BleMidiPacket._setHeaderTimestamp(): " +
+                    "Unstable timestamp: Differential error exceeds " +
+                    this.timestampErrorThreshold + " ms.");
+        console.log("  evantDelta: " + eventDelta + " ms.");
+        console.log("  bleDelta: " + bleDelta + " ms.");
+        console.log("  diff: " + diff + " ms.");
+      } else if (this._bWaitUntilStable) {
         console.log("BleMidiPacket._setHeaderTimestamp(): " +
                     "Stabilized timestamp");
         this._deltaUnaddedDecode = 0;

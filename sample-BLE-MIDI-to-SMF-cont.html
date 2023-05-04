@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Sample BLE-MIDI to SMF continuance</title>
+    <script type="module" src="./js-for-sample/sample-BLE-MIDI-to-SMF-cont.js">
+    </script>
+    <script type="module" src="./js-for-sample/InterceptConsole.js">
+    </script>
+  </head>
+  <body>
+    <h1>Sample BLE-MIDI to SMF continuance</h1>
+    <p>
+      Sample BLE-MIDI to SMF continuance<br>
+      Copyright (C) 2023 Masamichi Hosoda<br>
+      License: BSD-2-Clause<br>
+      <a href="https://github.com/trueroad/tr-MidiJS">
+        https://github.com/trueroad/tr-MidiJS
+      </a>
+    </p>
+
+    <hr>
+
+    <h2>Function</h2>
+    <p>
+      Status: <span id="statusSpan"></span>
+    </p>
+    <p>
+      <button id="selectStartButton">select start</button><br>
+      URL where SMFs divided by gap are POSTed:<br>
+      <input type="text" id="postUrl" style="width: 95%;"
+             value='http://localhost:5000/midi/evaluate'><br>
+      <button id="stopButton">stop</button><br>
+    </p>
+
+    <h2>POST result</h2>
+    <p>
+      <textarea id="postResult" readonly
+                cols="80" rows="25"></textarea>
+    </p>
+
+    <hr>
+
+    <h2>console.log</h2>
+    <p>
+      <button id="interceptStartButton">Intercept start</button>
+      <button id="interceptStopButton">Intercept stop</button>
+      <button id="clearInterceptLogButton">Clear Log</button>
+    </p>
+    <p>
+      <textarea id="interceptLog" readonly
+                cols="80" rows="25"></textarea>
+    </p>
+  </body>
+</html>
