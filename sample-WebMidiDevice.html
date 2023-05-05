@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Sample using WebMidiDevice.js</title>
+    <script type="module" src="./js-for-sample/sample-WebMidiDevice.js">
+    </script>
+    <script type="module" src="./js-for-sample/InterceptConsole.js">
+    </script>
+  </head>
+  <body>
+    <h1>Sample using WebMidiDevice.js</h1>
+    <p>
+      Sample using Web MIDI device module<br>
+      Copyright (C) 2023 Masamichi Hosoda<br>
+      License: BSD-2-Clause<br>
+      <a href="https://github.com/trueroad/tr-MidiJS">
+        https://github.com/trueroad/tr-MidiJS
+      </a>
+    </p>
+
+    <hr>
+
+    <h2>Function</h2>
+    <p>
+      <button id="getMidiPortButton">Get MIDI port</button>
+      <span id="getMidiPortStatus"></span>
+    </p>
+    <p>
+      <button id="startButton">start</button><br>
+      MIDI IN port: <select id="selectMidiInPort"></select><br>
+      <button id="stopButton">stop</button>
+    </p>
+    <p>
+      <button id="sendButton">send</button><br>
+      MIDI OUT port: <select id="selectMidiOutPort"></select><br>
+      <input type="text" id="sendMessage" style="width: 95%;"
+             value='{"message": [144, 64, 120]}'>
+    </p>
+
+    <hr>
+
+    <h2>MIDI message received</h2>
+    <p>
+      <button id="clearMidiMessageReceivedLogButton">Clear Log</button>
+    </p>
+    <p>
+      <textarea id="midiMessageReceivedLog" readonly
+                cols="80" rows="25"></textarea>
+    </p>
+
+    <hr>
+
+    <h2>console.log</h2>
+    <p>
+      <button id="interceptStartButton">Intercept start</button>
+      <button id="interceptStopButton">Intercept stop</button>
+      <button id="clearInterceptLogButton">Clear Log</button>
+    </p>
+    <p>
+      <textarea id="interceptLog" readonly
+                cols="80" rows="25"></textarea>
+    </p>
+  </body>
+</html>
