@@ -38,6 +38,7 @@ export class WebMidiDevice {
     this._inputList = {};
     this._outputList = {};
 
+    this._access = null;
     this._input = null;
     this._eventTimestampBefore = null;
 
@@ -50,10 +51,9 @@ export class WebMidiDevice {
   async buildMidiPortList() {
     console.log("WebMidiDevice.buildMidiPortList()");
 
-    let access;
     try {
-      access = await navigator.requestMIDIAccess({sysex: true,
-                                                  software: true});
+      this._access = await navigator.requestMIDIAccess({sysex: true,
+                                                        software: true});
     } catch (err) {
       console.log("WebMidiDevice.buildMidiPortList(): " +
                   "navigator.requestMIDIAccess() error: " + err);
@@ -62,17 +62,17 @@ export class WebMidiDevice {
 
     this._inputList = {};
     this.inputIDs = [];
-    access.inputs.forEach(input => {
+    for (const input of this._access.inputs.values()) {
       this._inputList[input.id] = input;
       this.inputIDs.push(input.id);
-    });
+    }
 
     this._outputList = {};
     this.outputIDs = [];
-    access.outputs.forEach(output => {
+    for (const output of this._access.outputs.values()) {
       this._outputList[output.id] = output;
       this.outputIDs.push(output.id);
-    });
+    }
   }
 
   /**
