@@ -94,6 +94,15 @@ export class WebMidiDevice {
   }
 
   /**
+   * Get current MIDI IN port.
+   * @return {?MIDIInput} MIDI IN port.
+   *     If null, it means MIDI IN port is not used.
+   */
+  getCurrentMidiInPort() {
+    return this._input;
+  }
+
+  /**
    * Get MIDI IN port name.
    * @param {string} id - MIDI IN port ID.
    * @return {string} MIDI IN port name.
@@ -109,6 +118,18 @@ export class WebMidiDevice {
    */
   getMidiOutPortName(id) {
     return this._outputList[id].name;
+  }
+
+  /**
+   * Get current MIDI IN port name.
+   * @return {?string} MIDI IN port name.
+   *     If null, it means MIDI IN port is not used.
+   */
+  getCurrentMidiInPortName() {
+    if (this._input) {
+      return this._input.name;
+    }
+    return null;
   }
 
   /**

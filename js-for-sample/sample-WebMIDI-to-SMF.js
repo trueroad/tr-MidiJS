@@ -160,8 +160,7 @@ function start() {
   recordingDateTime = new Date();
   const text = JSON.stringify(
     {"Module": "WebMidiDevice.js",
-     "Device":
-     webMidiDevice.getMidiInPortName(selectMidiInPort.value),
+     "Device": webMidiDevice.getCurrentMidiInPortName(),
      "User-Agent": navigator.userAgent,
      "Language": navigator.language,
      "Location": location.href,

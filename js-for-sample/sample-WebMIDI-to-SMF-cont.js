@@ -122,7 +122,7 @@ async function _post_smf() {
   smfEncoder.initialize();
   const text = JSON.stringify(
     {"Module": "WebMidiDevice.js",
-     "Device": webMidiDevice.getMidiInPortName(selectMidiInPort.value),
+     "Device": webMidiDevice.getCurrentMidiInPortName(),
      "User-Agent": navigator.userAgent,
      "Language": navigator.language,
      "Location": location.href,
@@ -188,7 +188,7 @@ function start() {
   recordingDateTime = new Date();
   const text = JSON.stringify(
     {"Module": "WebMidiDevice.js",
-     "Device": webMidiDevice.getMidiInPortName(selectMidiInPort.value),
+     "Device": webMidiDevice.getCurrentMidiInPortName(),
      "User-Agent": navigator.userAgent,
      "Language": navigator.language,
      "Location": location.href,
