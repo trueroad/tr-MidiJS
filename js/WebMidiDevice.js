@@ -53,18 +53,37 @@ export class WebMidiDevice {
   }
 
   /**
-   * Build MIDI IN/OUT port list.
+   * Initialize MIDI IN/OUT port.
    */
-  async buildMidiPortList() {
-    console.log("WebMidiDevice.buildMidiPortList()");
+  async initialize() {
+    console.log("WebMidiDevice.initialize()");
+
+    if (this._access) {
+      this._access.removeEventListener("statechange",
+                                       this._onStateChangeBinded);
+      this._access = null;
+    }
 
     try {
       this._access = await navigator.requestMIDIAccess({sysex: true,
                                                         software: true});
     } catch (err) {
-      console.log("WebMidiDevice.buildMidiPortList(): " +
+      console.log("WebMidiDevice.initialize(): " +
                   "navigator.requestMIDIAccess() error: " + err);
       throw err;
+    }
+
+    this._access.addEventListener("statechange", this._onStateChangeBinded);
+  }
+
+  /**
+   * Build MIDI IN/OUT port list.
+   */
+  async buildMidiPortList() {
+    console.log("WebMidiDevice.buildMidiPortList()");
+
+    if (!this._access) {
+      await this.initialize();
     }
 
     this._inputList = {};
@@ -80,8 +99,6 @@ export class WebMidiDevice {
       this._outputList[output.id] = output;
       this.outputIDs.push(output.id);
     }
-
-    this._access.addEventListener("statechange", this._onStateChangeBinded);
   }
 
   /**
