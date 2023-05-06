@@ -18,6 +18,12 @@ export class WebMidiDevice {
     console.log("WebMidiDevice.constructor()");
 
     /**
+     * Specify a handler function to be called when MIDI port state is changed.
+     *     If null, the default handler is called.
+     * @member {?module:WebMidiDevice.WebMidiDevice~HandlerMidiStateChanged}
+     */
+    this.handlerMidiStateChanged = null;
+    /**
      * Specify a handler function to be called when a MIDI message is received.
      *     If null, the default handler is called.
      * @member {?module:WebMidiDevice.WebMidiDevice~HandlerMidiMessageReceived}
@@ -42,6 +48,7 @@ export class WebMidiDevice {
     this._input = null;
     this._eventTimestampBefore = null;
 
+    this._onStateChangeBinded = this.onStateChange.bind(this);
     this._onMidiMessageBinded = this.onMidiMessage.bind(this);
   }
 
@@ -73,6 +80,8 @@ export class WebMidiDevice {
       this._outputList[output.id] = output;
       this.outputIDs.push(output.id);
     }
+
+    this._access.addEventListener("statechange", this._onStateChangeBinded);
   }
 
   /**
@@ -167,6 +176,18 @@ export class WebMidiDevice {
   }
 
   /**
+   * Event listener for "onstatechange".
+   * @param {Event} event - Information of the event.
+   */
+  onStateChange(event) {
+    if (this.handlerMidiStateChanged) {
+      this.handlerMidiStateChanged(event.port.id);
+    } else {
+      this.defaultHandlerMidiStateChanged(event.port.id);
+    }
+  }
+
+  /**
    * Event listener for "onmidimessage".
    * @param {Event} event - Information of the event.
    */
@@ -181,6 +202,21 @@ export class WebMidiDevice {
     } else {
       this.defaultHandlerMidiMessageReceived(eventDelta, event.data);
     }
+  }
+
+  /**
+   * Handler function to be called when MIDI port state is changed.
+   * @callback module:WebMidiDevice.WebMidiDevice~HandlerMidiStateChanged
+   * @param {string} id - MIDI IN/OUT port ID.
+   */
+
+  /**
+   * Default handler function to be called when MIDI port state is changed.
+   * @param {string} id - MIDI IN/OUT port ID.
+   */
+  defaultHandlerMidiStateChanged(id) {
+    console.log("*** MIDI port state is changed ***");
+    console.log("  port ID: " + id);
   }
 
   /**
