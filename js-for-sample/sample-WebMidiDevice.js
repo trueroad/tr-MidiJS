@@ -47,6 +47,20 @@ const midiMessageReceivedLog =
 //
 
 /**
+ * Sample handler function to be called when MIDI port state is changed.
+ * @param {string} id - MIDI IN/OUT port ID.
+ */
+function sampleHandlerMidiStateChanged(id) {
+  // Call default handler
+  webMidiDevice.defaultHandlerMidiStateChanged(id);
+  // Reflect MIDI port select
+  getMidiPort();
+}
+
+// Set the sample handler function.
+webMidiDevice.handlerMidiStateChanged = sampleHandlerMidiStateChanged;
+
+/**
  * Sample handler function to be called when a MIDI message is received.
  * @param {number} delta - Delta time in millisecond.
  * @param {Uint8Array} message - Received MIDI message.
