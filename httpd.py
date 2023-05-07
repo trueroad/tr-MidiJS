@@ -48,7 +48,8 @@ app: Flask = Flask(__name__, static_folder='.', static_url_path='/')
 def main() -> None:
     """Test main."""
     POSTDIR.mkdir(parents=True, exist_ok=True)
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0')  # For IPv4
+    # app.run(debug=True, host='::')  # For IPv6
 
 
 @app.route('/midi/evaluate', methods=['POST', 'OPTIONS'])
