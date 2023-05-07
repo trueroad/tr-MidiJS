@@ -55,6 +55,14 @@ export class GapDetector {
   }
 
   /**
+   * Is in gap?
+   * @return {bool} If true, in gap. False otherwise.
+   */
+  isInGap() {
+    return this._bInGap;
+  }
+
+  /**
    * Detect gaps between groups of notes.
    * @param {number} delta - Delta time in millisecond.
    * @param {Uint8Array} message - MIDI message.

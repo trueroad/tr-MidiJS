@@ -62,12 +62,27 @@ const filteredLog = document.getElementById("filteredLog");
 /**
  * Handler function to be called when MIDI port state is changed.
  * @param {string} id - MIDI IN/OUT port ID.
+ * @param {string} type - MIDI IN/OUT port type.
+ * @param {string} state - MIDI IN/OUT port state.
+ * @param {string} connection - MIDI IN/OUT port connection.
  */
-function handlerMidiStateChanged(
-  // eslint-disable-next-line no-unused-vars
-  id) {
-  // Reflect MIDI port select
-  getMidiPort();
+function handlerMidiStateChanged(id,
+                                 // eslint-disable-next-line no-unused-vars
+                                 type,
+                                 state,
+                                 connection) {
+  const currentId = webMidiDevice.getCurrentMidiInPortID();
+  if (currentId) {
+    // MIDI IN port is in use.
+    if (id === currentId &&
+        (state === "disconnected" || connection === "closed")) {
+      stop();
+    }
+  } else {
+    // MIDI IN port is not in use.
+    // Reflect MIDI port select
+    getMidiPort();
+  }
 }
 
 // Set the sample handler function.
@@ -145,17 +160,28 @@ async function getMidiPort() {
     return;
   }
 
+  const selectedMidiInId = selectMidiInPort.value;
+
   while (selectMidiInPort.lastChild) {
     selectMidiInPort.removeChild(selectMidiInPort.lastChild);
   }
 
+  let bExistBeforeMidiInPort = false;
   for (const id of webMidiDevice.inputIDs) {
     console.log(id + ": " + webMidiDevice.getMidiInPortName(id));
+
+    if (id === selectedMidiInId) {
+      bExistBeforeMidiInPort = true;
+    }
 
     const opt = document.createElement("option");
     opt.text = webMidiDevice.getMidiInPortName(id);
     opt.value = id;
     selectMidiInPort.appendChild(opt);
+  }
+
+  if (bExistBeforeMidiInPort) {
+    selectMidiInPort.value = selectedMidiInId;
   }
 
   recordButton.removeAttribute("disabled");
@@ -174,7 +200,7 @@ function start() {
   recordingDateTime = new Date();
   const text = JSON.stringify(
     {"Module": "WebMidiDevice.js",
-     "Device": webMidiDevice.getCurrentMidiInPortName(),
+     "Device": webMidiDevice.getMidiInPortName(selectMidiInPort.value),
      "User-Agent": navigator.userAgent,
      "Language": navigator.language,
      "Location": location.href,

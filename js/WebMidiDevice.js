@@ -147,6 +147,18 @@ export class WebMidiDevice {
   }
 
   /**
+   * Get current MIDI IN port ID.
+   * @return {?string} MIDI IN port ID.
+   *     If null, it means MIDI IN port is not used.
+   */
+  getCurrentMidiInPortID() {
+    if (this._input) {
+      return this._input.id;
+    }
+    return null;
+  }
+
+  /**
    * Get current MIDI IN port name.
    * @return {?string} MIDI IN port name.
    *     If null, it means MIDI IN port is not used.
@@ -198,9 +210,15 @@ export class WebMidiDevice {
    */
   onStateChange(event) {
     if (this.handlerMidiStateChanged) {
-      this.handlerMidiStateChanged(event.port.id);
+      this.handlerMidiStateChanged(event.port.id,
+                                   event.port.type,
+                                   event.port.state,
+                                   event.port.connection);
     } else {
-      this.defaultHandlerMidiStateChanged(event.port.id);
+      this.defaultHandlerMidiStateChanged(event.port.id,
+                                          event.port.type,
+                                          event.port.state,
+                                          event.port.connection);
     }
   }
 
@@ -225,15 +243,28 @@ export class WebMidiDevice {
    * Handler function to be called when MIDI port state is changed.
    * @callback module:WebMidiDevice.WebMidiDevice~HandlerMidiStateChanged
    * @param {string} id - MIDI IN/OUT port ID.
+   * @param {string} type - MIDI IN/OUT port type.
+   *     "input": MIDI IN port., "output": MIDI OUT port.
+   * @param {string} state - MIDI IN/OUT port device state.
+   *     "disconnected": The device is disconnected from the system.,
+   *     "connected": The device is connected.
+   * @param {string} connection - MIDI IN/OUT port connection state.
+   *     "open", "closed", "pending"
    */
 
   /**
    * Default handler function to be called when MIDI port state is changed.
    * @param {string} id - MIDI IN/OUT port ID.
+   * @param {string} type - MIDI IN/OUT port type.
+   * @param {string} state - MIDI IN/OUT port device state.
+   * @param {string} connection - MIDI IN/OUT port connection state.
    */
-  defaultHandlerMidiStateChanged(id) {
+  defaultHandlerMidiStateChanged(id, type, state, connection) {
     console.log("*** MIDI port state is changed ***");
     console.log("  port ID: " + id);
+    console.log("  type: " + type);
+    console.log("  state: " + state);
+    console.log("  connection: " + connection);
   }
 
   /**
