@@ -163,6 +163,7 @@ function start() {
 function stop() {
   console.log("*** Stop ***");
   webMidiDevice.stop();
+  getMidiPort();
 }
 
 function send() {

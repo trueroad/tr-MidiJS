@@ -220,6 +220,7 @@ function stop() {
   downloadButton.setAttribute("disabled", true);
 
   webMidiDevice.stop();
+  getMidiPort();
 
   recordButton.removeAttribute("disabled");
   downloadButton.removeAttribute("disabled");

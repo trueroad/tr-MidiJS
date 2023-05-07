@@ -252,6 +252,8 @@ function stop() {
     _post_smf();
   }
 
+  getMidiPort();
+
   stopButton.setAttribute("disabled", true);
   selectMidiInPort.removeAttribute("disabled");
   postUrl.removeAttribute("disabled");
