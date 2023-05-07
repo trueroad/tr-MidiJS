@@ -108,6 +108,9 @@ async function getMidiPort() {
     return;
   }
 
+  const selectedMidiInId = selectMidiInPort.value;
+  const selectedMidiOutId = selectMidiOutPort.value;
+
   while (selectMidiInPort.lastChild) {
     selectMidiInPort.removeChild(selectMidiInPort.lastChild);
   }
@@ -115,21 +118,38 @@ async function getMidiPort() {
     selectMidiOutPort.removeChild(selectMidiOutPort.lastChild);
   }
 
+  let bExistBeforeMidiInPort = false;
   for (const id of webMidiDevice.inputIDs) {
     console.log(id + ": " + webMidiDevice.getMidiInPortName(id));
+
+    if (id === selectedMidiInId) {
+      bExistBeforeMidiInPort = true;
+    }
 
     const opt = document.createElement("option");
     opt.text = webMidiDevice.getMidiInPortName(id);
     opt.value = id;
     selectMidiInPort.appendChild(opt);
   }
+  let bExistBeforeMidiOutPort = false;
   for (const id of webMidiDevice.outputIDs) {
     console.log(id + ": " + webMidiDevice.getMidiOutPortName(id));
+
+    if (id === selectedMidiOutId) {
+      bExistBeforeMidiOutPort = true;
+    }
 
     const opt = document.createElement("option");
     opt.text = webMidiDevice.getMidiOutPortName(id);
     opt.value = id;
     selectMidiOutPort.appendChild(opt);
+  }
+
+  if (bExistBeforeMidiInPort) {
+    selectMidiInPort.value = selectedMidiInId;
+  }
+  if (bExistBeforeMidiOutPort) {
+    selectMidiOutPort.value = selectedMidiOutId;
   }
 
   getMidiPortStatus.innerText = "Succeeded";

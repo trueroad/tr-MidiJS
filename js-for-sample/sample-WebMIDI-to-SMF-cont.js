@@ -191,17 +191,28 @@ async function getMidiPort() {
     return;
   }
 
+  const selectedMidiInId = selectMidiInPort.value;
+
   while (selectMidiInPort.lastChild) {
     selectMidiInPort.removeChild(selectMidiInPort.lastChild);
   }
 
+  let bExistBeforeMidiInPort = false;
   for (const id of webMidiDevice.inputIDs) {
     console.log(id + ": " + webMidiDevice.getMidiInPortName(id));
+
+    if (id === selectedMidiInId) {
+      bExistBeforeMidiInPort = true;
+    }
 
     const opt = document.createElement("option");
     opt.text = webMidiDevice.getMidiInPortName(id);
     opt.value = id;
     selectMidiInPort.appendChild(opt);
+  }
+
+  if (bExistBeforeMidiInPort) {
+    selectMidiInPort.value = selectedMidiInId;
   }
 
   startButton.removeAttribute("disabled");
