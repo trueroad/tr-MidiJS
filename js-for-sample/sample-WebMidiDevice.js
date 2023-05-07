@@ -56,8 +56,19 @@ const midiMessageReceivedLog =
 function sampleHandlerMidiStateChanged(id, type, state, connection) {
   // Call default handler
   webMidiDevice.defaultHandlerMidiStateChanged(id, type, state, connection);
-  // Reflect MIDI port select
-  getMidiPort();
+
+  const currentId = webMidiDevice.getCurrentMidiInPortID();
+  if (currentId) {
+    // MIDI IN port is in use.
+    if (id === currentId &&
+        (state === "disconnected" || connection === "closed")) {
+      stop();
+    }
+  } else {
+    // MIDI IN port is not in use.
+    // Reflect MIDI port select
+    getMidiPort();
+  }
 }
 
 // Set the sample handler function.

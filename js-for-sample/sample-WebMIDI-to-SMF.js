@@ -66,11 +66,23 @@ const filteredLog = document.getElementById("filteredLog");
  * @param {string} state - MIDI IN/OUT port state.
  * @param {string} connection - MIDI IN/OUT port connection.
  */
-function handlerMidiStateChanged(
-  // eslint-disable-next-line no-unused-vars
-  id, type, state, connection) {
-  // Reflect MIDI port select
-  getMidiPort();
+function handlerMidiStateChanged(id,
+                                 // eslint-disable-next-line no-unused-vars
+                                 type,
+                                 state,
+                                 connection) {
+  const currentId = webMidiDevice.getCurrentMidiInPortID();
+  if (currentId) {
+    // MIDI IN port is in use.
+    if (id === currentId &&
+        (state === "disconnected" || connection === "closed")) {
+      stop();
+    }
+  } else {
+    // MIDI IN port is not in use.
+    // Reflect MIDI port select
+    getMidiPort();
+  }
 }
 
 // Set the sample handler function.
