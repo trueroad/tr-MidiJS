@@ -63,6 +63,20 @@ const postResult = document.getElementById("postResult");
 //
 
 /**
+ * Handler function to be called when MIDI port state is changed.
+ * @param {string} id - MIDI IN/OUT port ID.
+ */
+function handlerMidiStateChanged(
+  // eslint-disable-next-line no-unused-vars
+  id) {
+  // Reflect MIDI port select
+  getMidiPort();
+}
+
+// Set the sample handler function.
+webMidiDevice.handlerMidiStateChanged = handlerMidiStateChanged;
+
+/**
  * Handler function to be called a MIDI message is received.
  * @param {number} delta - Delta time in millisecond.
  * @param {Uint8Array} message - MIDI message (reassembled).
@@ -122,7 +136,7 @@ async function _post_smf() {
   smfEncoder.initialize();
   const text = JSON.stringify(
     {"Module": "WebMidiDevice.js",
-     "Device": webMidiDevice.getMidiInPortName(selectMidiInPort.value),
+     "Device": webMidiDevice.getCurrentMidiInPortName(),
      "User-Agent": navigator.userAgent,
      "Language": navigator.language,
      "Location": location.href,
@@ -188,7 +202,7 @@ function start() {
   recordingDateTime = new Date();
   const text = JSON.stringify(
     {"Module": "WebMidiDevice.js",
-     "Device": webMidiDevice.getMidiInPortName(selectMidiInPort.value),
+     "Device": webMidiDevice.getCurrentMidiInPortName(),
      "User-Agent": navigator.userAgent,
      "Language": navigator.language,
      "Location": location.href,
@@ -224,3 +238,9 @@ startButton &&
   startButton.addEventListener("click", start);
 stopButton &&
   stopButton.addEventListener("click", stop);
+
+//
+// Initialize select port
+//
+
+getMidiPort();

@@ -18,6 +18,12 @@ export class WebMidiDevice {
     console.log("WebMidiDevice.constructor()");
 
     /**
+     * Specify a handler function to be called when MIDI port state is changed.
+     *     If null, the default handler is called.
+     * @member {?module:WebMidiDevice.WebMidiDevice~HandlerMidiStateChanged}
+     */
+    this.handlerMidiStateChanged = null;
+    /**
      * Specify a handler function to be called when a MIDI message is received.
      *     If null, the default handler is called.
      * @member {?module:WebMidiDevice.WebMidiDevice~HandlerMidiMessageReceived}
@@ -38,10 +44,36 @@ export class WebMidiDevice {
     this._inputList = {};
     this._outputList = {};
 
+    this._access = null;
     this._input = null;
     this._eventTimestampBefore = null;
 
+    this._onStateChangeBinded = this.onStateChange.bind(this);
     this._onMidiMessageBinded = this.onMidiMessage.bind(this);
+  }
+
+  /**
+   * Initialize MIDI IN/OUT port.
+   */
+  async initialize() {
+    console.log("WebMidiDevice.initialize()");
+
+    if (this._access) {
+      this._access.removeEventListener("statechange",
+                                       this._onStateChangeBinded);
+      this._access = null;
+    }
+
+    try {
+      this._access = await navigator.requestMIDIAccess({sysex: true,
+                                                        software: true});
+    } catch (err) {
+      console.log("WebMidiDevice.initialize(): " +
+                  "navigator.requestMIDIAccess() error: " + err);
+      throw err;
+    }
+
+    this._access.addEventListener("statechange", this._onStateChangeBinded);
   }
 
   /**
@@ -50,29 +82,23 @@ export class WebMidiDevice {
   async buildMidiPortList() {
     console.log("WebMidiDevice.buildMidiPortList()");
 
-    let access;
-    try {
-      access = await navigator.requestMIDIAccess({sysex: true,
-                                                  software: true});
-    } catch (err) {
-      console.log("WebMidiDevice.buildMidiPortList(): " +
-                  "navigator.requestMIDIAccess() error: " + err);
-      throw err;
+    if (!this._access) {
+      await this.initialize();
     }
 
     this._inputList = {};
     this.inputIDs = [];
-    access.inputs.forEach(input => {
+    for (const input of this._access.inputs.values()) {
       this._inputList[input.id] = input;
       this.inputIDs.push(input.id);
-    });
+    }
 
     this._outputList = {};
     this.outputIDs = [];
-    access.outputs.forEach(output => {
+    for (const output of this._access.outputs.values()) {
       this._outputList[output.id] = output;
       this.outputIDs.push(output.id);
-    });
+    }
   }
 
   /**
@@ -94,6 +120,15 @@ export class WebMidiDevice {
   }
 
   /**
+   * Get current MIDI IN port.
+   * @return {?MIDIInput} MIDI IN port.
+   *     If null, it means MIDI IN port is not used.
+   */
+  getCurrentMidiInPort() {
+    return this._input;
+  }
+
+  /**
    * Get MIDI IN port name.
    * @param {string} id - MIDI IN port ID.
    * @return {string} MIDI IN port name.
@@ -109,6 +144,18 @@ export class WebMidiDevice {
    */
   getMidiOutPortName(id) {
     return this._outputList[id].name;
+  }
+
+  /**
+   * Get current MIDI IN port name.
+   * @return {?string} MIDI IN port name.
+   *     If null, it means MIDI IN port is not used.
+   */
+  getCurrentMidiInPortName() {
+    if (this._input) {
+      return this._input.name;
+    }
+    return null;
   }
 
   /**
@@ -146,6 +193,18 @@ export class WebMidiDevice {
   }
 
   /**
+   * Event listener for "onstatechange".
+   * @param {Event} event - Information of the event.
+   */
+  onStateChange(event) {
+    if (this.handlerMidiStateChanged) {
+      this.handlerMidiStateChanged(event.port.id);
+    } else {
+      this.defaultHandlerMidiStateChanged(event.port.id);
+    }
+  }
+
+  /**
    * Event listener for "onmidimessage".
    * @param {Event} event - Information of the event.
    */
@@ -160,6 +219,21 @@ export class WebMidiDevice {
     } else {
       this.defaultHandlerMidiMessageReceived(eventDelta, event.data);
     }
+  }
+
+  /**
+   * Handler function to be called when MIDI port state is changed.
+   * @callback module:WebMidiDevice.WebMidiDevice~HandlerMidiStateChanged
+   * @param {string} id - MIDI IN/OUT port ID.
+   */
+
+  /**
+   * Default handler function to be called when MIDI port state is changed.
+   * @param {string} id - MIDI IN/OUT port ID.
+   */
+  defaultHandlerMidiStateChanged(id) {
+    console.log("*** MIDI port state is changed ***");
+    console.log("  port ID: " + id);
   }
 
   /**

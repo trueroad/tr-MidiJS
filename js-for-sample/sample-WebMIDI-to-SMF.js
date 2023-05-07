@@ -60,6 +60,20 @@ const filteredLog = document.getElementById("filteredLog");
 //
 
 /**
+ * Handler function to be called when MIDI port state is changed.
+ * @param {string} id - MIDI IN/OUT port ID.
+ */
+function handlerMidiStateChanged(
+  // eslint-disable-next-line no-unused-vars
+  id) {
+  // Reflect MIDI port select
+  getMidiPort();
+}
+
+// Set the sample handler function.
+webMidiDevice.handlerMidiStateChanged = handlerMidiStateChanged;
+
+/**
  * Handler function to be called when a MIDI message is received.
  * @param {number} delta - Delta time in millisecond.
  * @param {Uint8Array} message - Received MIDI message.
@@ -160,8 +174,7 @@ function start() {
   recordingDateTime = new Date();
   const text = JSON.stringify(
     {"Module": "WebMidiDevice.js",
-     "Device":
-     webMidiDevice.getMidiInPortName(selectMidiInPort.value),
+     "Device": webMidiDevice.getCurrentMidiInPortName(),
      "User-Agent": navigator.userAgent,
      "Language": navigator.language,
      "Location": location.href,
@@ -219,3 +232,9 @@ clearReceivedLogButton &&
   clearReceivedLogButton.addEventListener("click", clearReceivedLog);
 clearFilteredLogButton &&
   clearFilteredLogButton.addEventListener("click", clearFilteredLog);
+
+//
+// Initialize select port
+//
+
+getMidiPort();
