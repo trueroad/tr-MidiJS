@@ -163,3 +163,9 @@ sendButton &&
 clearMidiMessageReceivedLogButton &&
   clearMidiMessageReceivedLogButton.addEventListener(
     "click", clearMidiMessageReceivedLog);
+
+//
+// Initialize select port
+//
+
+getMidiPort();
