@@ -222,6 +222,10 @@ function stop() {
 
   webMidiDevice.stop();
 
+  if (!gapDetector.isInGap()) {
+    _post_smf();
+  }
+
   stopButton.setAttribute("disabled", true);
   selectMidiInPort.removeAttribute("disabled");
   postUrl.removeAttribute("disabled");

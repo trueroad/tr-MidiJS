@@ -254,6 +254,10 @@ async function stop() {
     return;
   }
 
+  if (!gapDetector.isInGap()) {
+    _post_smf();
+  }
+
   stopButton.setAttribute("disabled", true);
   postUrl.removeAttribute("disabled");
   statusSpan.innerText = "Stopped.";
