@@ -62,10 +62,13 @@ const filteredLog = document.getElementById("filteredLog");
 /**
  * Handler function to be called when MIDI port state is changed.
  * @param {string} id - MIDI IN/OUT port ID.
+ * @param {string} type - MIDI IN/OUT port type.
+ * @param {string} state - MIDI IN/OUT port state.
+ * @param {string} connection - MIDI IN/OUT port connection.
  */
 function handlerMidiStateChanged(
   // eslint-disable-next-line no-unused-vars
-  id) {
+  id, type, state, connection) {
   // Reflect MIDI port select
   getMidiPort();
 }
