@@ -271,3 +271,5 @@ selectStartButton &&
   selectStartButton.addEventListener("click", selectStart);
 stopButton &&
   stopButton.addEventListener("click", stop);
+
+window.addEventListener("beforeunload", stop);

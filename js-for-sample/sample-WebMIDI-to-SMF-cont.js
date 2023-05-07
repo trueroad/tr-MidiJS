@@ -243,6 +243,8 @@ startButton &&
 stopButton &&
   stopButton.addEventListener("click", stop);
 
+window.addEventListener("beforeunload", stop);
+
 //
 // Initialize select port
 //
