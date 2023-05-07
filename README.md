@@ -9,6 +9,15 @@ https://github.com/trueroad/tr-MidiJS
 
 ### BLE-MIDI (using Web Bluetooth MIDI)
 
+* Environments in which the demo worked (2023-05-07)
+    + Central
+        - Windows 10 22H2 + Edge 113
+        - Windows 10 22H2 + Chrome 113
+        - Android 8.0.0 + Chrome 113
+    + Peripheral
+        - MD-BT01 firmware version 1.0.7
+        - WIDI Master firmware version 0.2.0.1
+
 #### Sample BLE-MIDI to SMF
 
 https://trueroad.github.io/tr-MidiJS/sample-BLE-MIDI-to-SMF.html
@@ -37,6 +46,13 @@ https://trueroad.github.io/tr-MidiJS/sample-BleMidiPacket.html
 Demonstration of handling BLE-MIDI packets.
 
 ### Web MIDI (using Web MIDI API, USB MIDI etc.)
+
+* Environments in which the demo worked (2023-05-07)
+    + Host
+        - Windows 10 22H2 + Edge 113
+        - Windows 10 22H2 + Chrome 113
+    + Device
+        - M4U eX
 
 #### Sample Web MIDI to SMF
 
