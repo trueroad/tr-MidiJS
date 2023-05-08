@@ -51,11 +51,11 @@ def main() -> None:
     # For IPv4
     app.run(debug=True,
             # ssl_context=('cert.crt', 'cert.key'), port=443,  # For https
-            host='0.0.0.0')  # For IPv4 https
+            host='0.0.0.0')
     # For IPv6
     # app.run(debug=True,
     #         # ssl_context=('cert.crt', 'cert.key'), port=443,  # For https
-    #         host='::')  # For IPv6 https
+    #         host='::')
 
 
 @app.route('/midi/evaluate', methods=['POST', 'OPTIONS'])
