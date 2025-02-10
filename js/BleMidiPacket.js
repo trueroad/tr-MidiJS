@@ -2,7 +2,7 @@
  * BLE-MIDI packet module.
  * @module BleMidiPacket
  * @author Masamichi Hosoda <trueroad@trueroad.jp>
- * @copyright Masamichi Hosoda 2023
+ * @copyright Masamichi Hosoda 2023, 2025
  * @license BSD-2-Clause
  * @see {@link https://github.com/trueroad/tr-MidiJS}
  */
@@ -58,6 +58,7 @@ export class BleMidiPacket {
     this._eventTimestampBefore = null;
     this._deltaUnaddedDecode = 0;
     this._bWaitUntilStable = false;
+    this._bBleTimestampDetected = false;
   }
 
   /**
@@ -227,6 +228,22 @@ export class BleMidiPacket {
 
     this._deltaUnaddedDecode =
       8192 * Math.round((eventDelta - bleDelta) / 8192) + bleDelta;
+
+    // Workaround for devices that do not set BLE-MIDI timestamps
+    if (!this._bBleTimestampDetected) {
+      if (bleDelta !=0 ||
+          timestampHigh != 0 || this._bleTimestampLow !=0) {
+        console.log("BleMidiPacket._setHeaderTimestamp(): " +
+                    "BLE-MIDI timestamp is detected.");
+        this._bBleTimestampDetected = true;
+      } else {
+        console.log("BleMidiPacket._setHeaderTimestamp(): " +
+                    "Since BLE-MIDI timestamp is not detected, " +
+                    "event timestamp is used.");
+        this._deltaUnaddedDecode = eventDelta;
+        return;
+      }
+    }
 
     if (bleDelta === 0 && eventDelta === 0) {
       console.log("BleMidiPacket._setHeaderTimestamp(): initial packet");
